@@ -18,11 +18,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  release:
-    name: Build and create GitHub release
+  build:
+    name: Build release packages
+    if: github.event_name != 'workflow_dispatch' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    timeout-minutes: 30
     outputs:
       version: ${{ steps.version.outputs.version }}
       tag: ${{ steps.version.outputs.tag }}
@@ -31,7 +31,9 @@ jobs:
       VITE_BACKEND_ALLOWLIST: ${{ vars.VITE_BACKEND_ALLOWLIST }}
       PUBLISHER: ${{ vars.MARKETPLACE_PUBLISHER }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       - name: Resolve version
         id: version
@@ -50,7 +52,7 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "tag=v$version" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
           cache: npm
@@ -84,16 +86,33 @@ jobs:
           cp infra/out/main.json out/
           (cd out && sha256sum * > SHA256SUMS.txt)
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: release-${{ steps.version.outputs.version }}
           path: out/
           if-no-files-found: error
 
+  release:
+    name: Create GitHub release
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ needs.build.outputs.version }}
+      tag: ${{ needs.build.outputs.tag }}
+      vsix: ${{ needs.build.outputs.vsix }}
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: release-${{ needs.build.outputs.version }}
+          path: out
+
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ steps.version.outputs.tag }}
+          TAG: ${{ needs.build.outputs.tag }}
         run: |
           # --target is ignored when the tag already exists (tag push); manual runs tag the selected commit.
           gh release create "$TAG" out/* \
@@ -106,14 +125,15 @@ jobs:
     needs: release
     if: vars.PUBLISH_TO_MARKETPLACE == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment: marketplace
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: release-${{ needs.release.outputs.version }}
           path: out
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
 

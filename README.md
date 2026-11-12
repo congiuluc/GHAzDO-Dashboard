@@ -1,3 +1,5 @@
+![Advanced Security Dashboard logo](apps/docs/public/icon.png)
+
 # GHAzDO Dashboard
 
 An Azure DevOps Services extension that brings together **GitHub Advanced Security for Azure DevOps** alerts (code scanning, dependency scanning and secret scanning) for every project and repository into one dashboard.
@@ -56,6 +58,9 @@ To preview the docs site, run `npm run docs:dev`.
 | `ci.yml` | Push to `main`, PRs, manual | Validate, build Bicep, package the VSIX and `functions.zip`, upload them as an artifact |
 | `release.yml` | Tag `v*.*.*`, or manual with a version | Package with that version, create a GitHub release (VSIX, `functions.zip`, `main.json`, `SHA256SUMS.txt`), optionally publish to the Marketplace, redeploy the docs |
 | `pages.yml` | Push to `main` under `apps/docs`, manual, called by release | Build `apps/docs` and deploy it to GitHub Pages |
+| `dependency-review.yml` | Pull requests to `main` | Reject newly introduced high or critical vulnerable dependencies |
+
+Actions are pinned to immutable commit SHAs. Dependabot checks npm dependencies and action pins weekly. Build jobs use read-only tokens; release publishing and Pages deployment receive write permissions only in isolated jobs. Manual releases run from `main`.
 
 One-time setup:
 - Set *Settings → Pages → Source* to **GitHub Actions**.
@@ -96,6 +101,8 @@ Then:
 Snapshot blobs expire after 370 days through a lifecycle rule. That rule also removes data for repositories that were deleted.
 
 ## Security notes
+
+See [SECURITY.md](SECURITY.md) for supported versions and private vulnerability reporting.
 
 - **Admin checks:** in browser-only mode, the admin-only Settings UI is gated client-side through a Graph membership check. Shared settings are stored in extension data, which any user of the extension can technically write. Treat those settings as configuration, not as a security boundary. The backend URL is always checked against the build-time allowlist.
 - **Backend authentication:** the backend checks the extension app token (HS256, signed with the extension secret), enforces a CORS allowlist, and uses HMAC-signed paging cursors.
