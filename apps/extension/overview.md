@@ -1,3 +1,5 @@
+![Advanced Security Dashboard logo](static/icon.png)
+
 # Advanced Security Dashboard
 
 One place to see **GitHub Advanced Security for Azure DevOps** alerts across every project and repository in your organization.
