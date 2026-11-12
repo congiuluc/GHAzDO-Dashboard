@@ -1,0 +1,140 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, e.g. 0.0.1 (creates tag v0.0.1 on the selected commit)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build and create GitHub release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+      vsix: ${{ steps.package.outputs.vsix }}
+    env:
+      VITE_BACKEND_ALLOWLIST: ${{ vars.VITE_BACKEND_ALLOWLIST }}
+      PUBLISHER: ${{ vars.MARKETPLACE_PUBLISHER }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then raw="$GITHUB_REF_NAME"; else raw="$INPUT_VERSION"; fi
+          version="${raw#v}"
+          # The Marketplace only accepts numeric versions (no pre-release labels).
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Version '$raw' must be major.minor.patch, e.g. 0.0.1"; exit 1
+          fi
+          if [ -z "$PUBLISHER" ]; then
+            echo "::error::Set the MARKETPLACE_PUBLISHER repository variable to your Marketplace publisher ID."; exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck, lint, test, build
+        run: npm run validate
+
+      - name: Build Bicep
+        run: |
+          az bicep install
+          npm run bicep:build
+
+      - name: Package extension
+        id: package
+        working-directory: apps/extension
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          override=$(jq -nc --arg v "$VERSION" --arg p "$PUBLISHER" '{version: $v, publisher: $p}')
+          npx tfx extension create --manifest-globs vss-extension.json --output-path ../../out --override "$override" --no-prompt
+          vsix=$(ls ../../out/*.vsix)
+          echo "vsix=$(basename "$vsix")" >> "$GITHUB_OUTPUT"
+
+      - name: Package functions
+        run: |
+          npm run package:functions
+          cp apps/functions/functions.zip out/
+          cp infra/out/main.json out/
+          (cd out && sha256sum * > SHA256SUMS.txt)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ steps.version.outputs.version }}
+          path: out/
+          if-no-files-found: error
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          # --target is ignored when the tag already exists (tag push); manual runs tag the selected commit.
+          gh release create "$TAG" out/* \
+            --title "$TAG" \
+            --target "$GITHUB_SHA" \
+            --generate-notes
+
+  marketplace:
+    name: Publish to Visual Studio Marketplace
+    needs: release
+    if: vars.PUBLISH_TO_MARKETPLACE == 'true'
+    runs-on: ubuntu-latest
+    environment: marketplace
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-${{ needs.release.outputs.version }}
+          path: out
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Publish
+        env:
+          MARKETPLACE_PAT: ${{ secrets.MARKETPLACE_PAT }}
+          SHARE_WITH: ${{ vars.MARKETPLACE_SHARE_WITH }}
+          VSIX: out/${{ needs.release.outputs.vsix }}
+        run: |
+          if [ -z "$MARKETPLACE_PAT" ]; then echo "::error::MARKETPLACE_PAT secret is not set."; exit 1; fi
+          args=(extension publish --vsix "$VSIX" --token "$MARKETPLACE_PAT" --no-prompt)
+          if [ -n "$SHARE_WITH" ]; then args+=(--share-with $SHARE_WITH); fi
+          npx --yes tfx-cli@0.24.2 "${args[@]}"
+
+  docs:
+    name: Refresh documentation
+    needs: release
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/pages.yml
+    with:
+      version: ${{ needs.release.outputs.tag }}

@@ -1,0 +1,26 @@
+{
+  "name": "@ghazdo/functions",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "dist/main.js",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "node build.mjs",
+    "package": "node build.mjs --package",
+    "start": "npm run build && func start"
+  },
+  "dependencies": {
+    "@azure/communication-email": "^1.1.0",
+    "@azure/data-tables": "^13.3.0",
+    "@azure/functions": "^4.17.1",
+    "@azure/identity": "^4.13.0",
+    "@azure/storage-blob": "^12.29.0",
+    "jose": "^6.2.15"
+  },
+  "devDependencies": {
+    "@ghazdo/shared": "0.0.1",
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.28.2"
+  }
+}

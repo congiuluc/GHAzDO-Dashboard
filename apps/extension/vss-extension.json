@@ -1,0 +1,203 @@
+{
+  "manifestVersion": 1,
+  "id": "ghazdo-security-dashboard",
+  "publisher": "4workers",
+  "version": "0.0.1",
+  "name": "Advanced Security Dashboard",
+  "description": "One dashboard for GitHub Advanced Security for Azure DevOps alerts across all projects and repositories: code scanning, dependency scanning and secret scanning, with history, filters and drill-down.",
+  "public": false,
+  "categories": ["Azure Repos"],
+  "tags": ["security", "advanced security", "GHAzDO", "dashboard", "secret scanning", "dependency scanning", "code scanning"],
+  "targets": [{ "id": "Microsoft.VisualStudio.Services.Cloud" }],
+  "icons": { "default": "static/icon.png" },
+  "content": { "details": { "path": "overview.md" } },
+  "scopes": ["vso.advsec", "vso.project", "vso.code", "vso.graph", "vso.work_write", "vso.extension.data_write"],
+  "demands": ["api-version/7.1"],
+  "files": [
+    { "path": "dist", "addressable": true },
+    { "path": "static", "addressable": true }
+  ],
+  "contributions": [
+    {
+      "id": "ghazdo-hub-group",
+      "type": "ms.vss-web.hub-group",
+      "description": "Organization-level Advanced Security navigation group.",
+      "targets": ["ms.vss-web.collection-hub-groups-collection"],
+      "properties": { "name": "Advanced Security", "order": 100, "icon": "asset://static/icon.png" }
+    },
+    {
+      "id": "ghazdo-hub",
+      "type": "ms.vss-web.hub",
+      "description": "Organization-wide Advanced Security dashboard.",
+      "targets": [".ghazdo-hub-group"],
+      "properties": { "name": "Security dashboard", "order": 1, "uri": "dist/hub.html", "icon": "asset://static/icon.png" }
+    },
+    {
+      "id": "ghazdo-org-settings-hub",
+      "type": "ms.vss-web.hub",
+      "description": "Organization-wide Advanced Security dashboard in Organization settings.",
+      "targets": ["ms.vss-web.collection-admin-hub-group"],
+      "properties": { "name": "Advanced Security dashboard", "order": 100, "uri": "dist/hub.html", "icon": "asset://static/icon.png" }
+    },
+    {
+      "id": "ghazdo-project-hub-group",
+      "type": "ms.vss-web.hub-group",
+      "description": "Project-level Advanced Security navigation group, placed after Artifacts.",
+      "targets": ["ms.vss-web.project-hub-groups-collection"],
+      "properties": { "name": "Advanced Security", "order": 1000, "icon": "asset://static/icon.png" }
+    },
+    {
+      "id": "ghazdo-project-hub",
+      "type": "ms.vss-web.hub",
+      "description": "Advanced Security dashboard for the current project.",
+      "targets": [".ghazdo-project-hub-group"],
+      "properties": { "name": "Security dashboard", "order": 1, "uri": "dist/project-hub.html", "icon": "asset://static/icon.png" }
+    },
+    {
+      "id": "ghazdo-widget-config",
+      "type": "ms.vss-dashboards-web.widget-configuration",
+      "targets": ["ms.vss-dashboards-web.widget-configuration"],
+      "properties": { "name": "Advanced Security widget configuration", "description": "Choose project scope, repositories and alert types.", "uri": "dist/widget-config.html" }
+    },
+    {
+      "id": "ghazdo-widget-kpi",
+      "type": "ms.vss-dashboards-web.widget",
+      "targets": ["ms.vss-dashboards-web.widget-catalog", ".ghazdo-widget-config"],
+      "properties": {
+        "name": "Advanced Security summary",
+        "description": "Open, critical and high, new and fixed alerts.",
+        "catalogIconUrl": "static/icon.png",
+        "uri": "dist/widget.html",
+        "isNameConfigurable": true,
+        "supportedSizes": [{ "rowSpan": 1, "columnSpan": 2 }, { "rowSpan": 2, "columnSpan": 2 }],
+        "supportedScopes": ["project_team"]
+      }
+    },
+    {
+      "id": "ghazdo-widget-severity",
+      "type": "ms.vss-dashboards-web.widget",
+      "targets": ["ms.vss-dashboards-web.widget-catalog", ".ghazdo-widget-config"],
+      "properties": {
+        "name": "Advanced Security by severity",
+        "description": "Open alerts by severity.",
+        "catalogIconUrl": "static/icon.png",
+        "uri": "dist/widget.html",
+        "isNameConfigurable": true,
+        "supportedSizes": [{ "rowSpan": 2, "columnSpan": 2 }, { "rowSpan": 2, "columnSpan": 3 }],
+        "supportedScopes": ["project_team"]
+      }
+    },
+    {
+      "id": "ghazdo-widget-top-repos",
+      "type": "ms.vss-dashboards-web.widget",
+      "targets": ["ms.vss-dashboards-web.widget-catalog", ".ghazdo-widget-config"],
+      "properties": {
+        "name": "Advanced Security top repositories",
+        "description": "Repositories with the highest weighted risk.",
+        "catalogIconUrl": "static/icon.png",
+        "uri": "dist/widget.html",
+        "isNameConfigurable": true,
+        "supportedSizes": [{ "rowSpan": 2, "columnSpan": 2 }, { "rowSpan": 2, "columnSpan": 3 }, { "rowSpan": 3, "columnSpan": 3 }],
+        "supportedScopes": ["project_team"]
+      }
+    },
+    {
+      "id": "ghazdo-widget-secrets",
+      "type": "ms.vss-dashboards-web.widget",
+      "targets": ["ms.vss-dashboards-web.widget-catalog", ".ghazdo-widget-config"],
+      "properties": {
+        "name": "Advanced Security exposed secrets",
+        "description": "Open secrets exposed for more than 7 days and the most affected repositories.",
+        "catalogIconUrl": "static/icon.png",
+        "uri": "dist/widget.html",
+        "isNameConfigurable": true,
+        "supportedSizes": [{ "rowSpan": 2, "columnSpan": 2 }, { "rowSpan": 2, "columnSpan": 3 }],
+        "supportedScopes": ["project_team"]
+      }
+    },
+    {
+      "id": "ghazdo-widget-sla",
+      "type": "ms.vss-dashboards-web.widget",
+      "targets": ["ms.vss-dashboards-web.widget-catalog", ".ghazdo-widget-config"],
+      "properties": {
+        "name": "Advanced Security overdue SLAs",
+        "description": "Open alerts past their configured remediation SLA.",
+        "catalogIconUrl": "static/icon.png",
+        "uri": "dist/widget.html",
+        "isNameConfigurable": true,
+        "supportedSizes": [{ "rowSpan": 2, "columnSpan": 2 }, { "rowSpan": 2, "columnSpan": 3 }],
+        "supportedScopes": ["project_team"]
+      }
+    },
+    {
+      "id": "ghazdo-widget-mttr",
+      "type": "ms.vss-dashboards-web.widget",
+      "targets": ["ms.vss-dashboards-web.widget-catalog", ".ghazdo-widget-config"],
+      "properties": {
+        "name": "Advanced Security mean time to fix",
+        "description": "Mean remediation time and its weekly trend.",
+        "catalogIconUrl": "static/icon.png",
+        "uri": "dist/widget.html",
+        "isNameConfigurable": true,
+        "supportedSizes": [{ "rowSpan": 2, "columnSpan": 2 }, { "rowSpan": 2, "columnSpan": 3 }],
+        "supportedScopes": ["project_team"]
+      }
+    },
+    {
+      "id": "ghazdo-widget-age",
+      "type": "ms.vss-dashboards-web.widget",
+      "targets": ["ms.vss-dashboards-web.widget-catalog", ".ghazdo-widget-config"],
+      "properties": {
+        "name": "Advanced Security alert age",
+        "description": "Open alerts grouped by age.",
+        "catalogIconUrl": "static/icon.png",
+        "uri": "dist/widget.html",
+        "isNameConfigurable": true,
+        "supportedSizes": [{ "rowSpan": 2, "columnSpan": 2 }, { "rowSpan": 2, "columnSpan": 3 }],
+        "supportedScopes": ["project_team"]
+      }
+    },
+    {
+      "id": "ghazdo-widget-burn-down",
+      "type": "ms.vss-dashboards-web.widget",
+      "targets": ["ms.vss-dashboards-web.widget-catalog", ".ghazdo-widget-config"],
+      "properties": {
+        "name": "Advanced Security new vs fixed",
+        "description": "Weekly new and fixed alert counts.",
+        "catalogIconUrl": "static/icon.png",
+        "uri": "dist/widget.html",
+        "isNameConfigurable": true,
+        "supportedSizes": [{ "rowSpan": 2, "columnSpan": 2 }, { "rowSpan": 2, "columnSpan": 3 }, { "rowSpan": 3, "columnSpan": 3 }],
+        "supportedScopes": ["project_team"]
+      }
+    },
+    {
+      "id": "ghazdo-widget-heatmap",
+      "type": "ms.vss-dashboards-web.widget",
+      "targets": ["ms.vss-dashboards-web.widget-catalog", ".ghazdo-widget-config"],
+      "properties": {
+        "name": "Advanced Security severity heatmap",
+        "description": "Severity hotspots across projects or repositories.",
+        "catalogIconUrl": "static/icon.png",
+        "uri": "dist/widget.html",
+        "isNameConfigurable": true,
+        "supportedSizes": [{ "rowSpan": 2, "columnSpan": 2 }, { "rowSpan": 2, "columnSpan": 3 }, { "rowSpan": 3, "columnSpan": 3 }],
+        "supportedScopes": ["project_team"]
+      }
+    },
+    {
+      "id": "ghazdo-widget-coverage",
+      "type": "ms.vss-dashboards-web.widget",
+      "targets": ["ms.vss-dashboards-web.widget-catalog", ".ghazdo-widget-config"],
+      "properties": {
+        "name": "Advanced Security scanner coverage",
+        "description": "Percentage of repositories with each scanner enabled.",
+        "catalogIconUrl": "static/icon.png",
+        "uri": "dist/widget.html",
+        "isNameConfigurable": true,
+        "supportedSizes": [{ "rowSpan": 2, "columnSpan": 2 }, { "rowSpan": 2, "columnSpan": 3 }],
+        "supportedScopes": ["project_team"]
+      }
+    }
+  ]
+}

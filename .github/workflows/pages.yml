@@ -1,0 +1,74 @@
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/docs/**"
+      - "apps/extension/static/icon.png"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      version:
+        description: Version label shown in the docs header
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Resolve version label
+        id: version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          label="$INPUT_VERSION"
+          if [ -z "$label" ]; then label=$(git describe --tags --abbrev=0 --match 'v*.*.*' 2>/dev/null || echo "main"); fi
+          echo "label=$label" >> "$GITHUB_OUTPUT"
+
+      - name: Build
+        env:
+          VITE_REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+          VITE_DOCS_VERSION: ${{ steps.version.outputs.label }}
+        run: npm run build --workspace apps/docs
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/docs/dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
