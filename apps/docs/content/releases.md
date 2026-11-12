@@ -20,7 +20,7 @@ Three GitHub Actions workflows live in `.github/workflows`.
 | `PUBLISH_TO_MARKETPLACE` | No | `true` to publish releases to the Marketplace |
 | `MARKETPLACE_SHARE_WITH` | No | Space-separated organizations to share the private extension with |
 
-3. **Secret** (only when publishing): `MARKETPLACE_PAT`, a token with the *Marketplace (Publish)* scope. The publish job runs in the `marketplace` environment, so you can add required reviewers to it.
+3. **Secret** (only when publishing): `MARKETPLACE_PAT`, a token with the *Marketplace (Publish)* scope, created by an identity that can publish extensions for the publisher configured in `MARKETPLACE_PUBLISHER`. That variable must match the publisher that owns the existing extension. The publish job runs in the `marketplace` environment, so you can add required reviewers to it.
 
 ## Cutting a release
 
