@@ -39,3 +39,17 @@ Versions must be `major.minor.patch` numbers, because the Marketplace does not a
 - `SHA256SUMS.txt`
 
 > Releases created by the workflow token do not trigger other workflows, so `release.yml` calls `pages.yml` directly to refresh the docs with the new version number.
+
+## Marketplace publishing errors
+
+If publishing says the extension is new and then says it already exists, `tfx` may have hidden an error while looking up the existing extension. After a publish failure, the workflow performs a read-only lookup and shows any lookup error. A lookup failure can also be expected for a first-time publication.
+
+To diagnose an already-created release without starting another run, replace `YOUR_PUBLISHER_ID` below and enter the same PAT at the hidden prompt:
+
+```powershell
+npx --yes tfx-cli@0.24.2 extension show --publisher YOUR_PUBLISHER_ID --extension-id ghazdo-security-dashboard
+```
+
+Do not include the PAT in the command or share it with the lookup output.
+
+For an existing extension, check that the PAT belongs to an identity with access to the correct Marketplace publisher and has the *Marketplace (Publish)* scope. If the GitHub release was already created, re-run the failed Marketplace job rather than creating the release again. Re-runs use the workflow from the original commit, so newer diagnostics only apply to new runs.

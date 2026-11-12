@@ -150,7 +150,15 @@ jobs:
           if [ -z "$MARKETPLACE_PAT" ]; then echo "::error::MARKETPLACE_PAT secret is not set."; exit 1; fi
           args=(extension publish --vsix "$VSIX" --token "$MARKETPLACE_PAT" --no-prompt)
           if [ -n "$SHARE_WITH" ]; then args+=(--share-with $SHARE_WITH); fi
-          npx --yes tfx-cli@0.24.2 "${args[@]}"
+          if ! npx --yes tfx-cli@0.24.2 "${args[@]}"; then
+            echo "::warning::Publish failed. Checking Marketplace access; a lookup failure may be expected for a new extension."
+            if npx --yes tfx-cli@0.24.2 extension show --vsix "$VSIX" --token "$MARKETPLACE_PAT" --no-prompt > /dev/null; then
+              echo "Marketplace lookup succeeded; see the publishing error above."
+            else
+              echo "::warning::Marketplace lookup failed. If the extension exists, check the PAT identity's publisher access."
+            fi
+            exit 1
+          fi
 
   docs:
     name: Refresh documentation
