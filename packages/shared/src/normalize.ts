@@ -149,9 +149,19 @@ function findFixedVersion(sources: (Record<string, unknown> | undefined)[]): str
 /** Parses package URLs (pkg:type/namespace/name@version) and common "ecosystem/name/version" or "name version" forms. */
 export function parsePackage(fqn: string): { name: string; version?: string; ecosystem?: string } {
   const value = fqn.trim();
-  const purl = /^pkg:([^/]+)\/(.+?)(?:@([^?#]+))?(?:[?#].*)?$/i.exec(value);
-  if (purl) {
-    return { ecosystem: purl[1]!.toLowerCase(), name: decodeURIComponent(purl[2]!), version: purl[3] ? decodeURIComponent(purl[3]) : undefined };
+  if (value.slice(0, 4).toLowerCase() === "pkg:") {
+    // Parsed with string scans instead of a regex to stay linear on untrusted input.
+    const rest = value.slice(4);
+    const slash = rest.indexOf("/");
+    const qualifier = rest.search(/[?#]/);
+    const body = qualifier >= 0 ? rest.slice(0, qualifier) : rest;
+    if (slash > 0 && slash < body.length - 1) {
+      const path = body.slice(slash + 1);
+      const at = path.lastIndexOf("@");
+      const name = at > 0 ? path.slice(0, at) : path;
+      const version = at > 0 && at < path.length - 1 ? path.slice(at + 1) : undefined;
+      return { ecosystem: body.slice(0, slash).toLowerCase(), name: decodeURIComponent(name), version: version ? decodeURIComponent(version) : undefined };
+    }
   }
   const at = /^(@?[^@\s]+)@([^\s@]+)$/.exec(value);
   if (at) return { name: at[1]!, version: at[2]! };

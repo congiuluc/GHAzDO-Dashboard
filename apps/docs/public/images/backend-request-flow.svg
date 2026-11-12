@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Dashboard request and authorization flow</title>
+  <desc id="desc">The extension sends an app token and the user's Azure DevOps token. The API verifies the app token, confirms the user token belongs to the same identity, checks which collected repositories that user can read with their own token, then aggregates only those snapshots and history.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0F6CBD"/>
+    </marker>
+    <marker id="arrowGrey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#616161"/>
+    </marker>
+    <style>
+      text { font-family: "Segoe UI", Helvetica, Arial, sans-serif; fill: #242424; }
+      .h1 { font-size: 22px; font-weight: 700; }
+      .title { font-size: 14px; font-weight: 600; }
+      .body { font-size: 12px; fill: #424242; }
+      .muted { font-size: 12px; fill: #616161; }
+      .mono { font-family: Consolas, "Cascadia Mono", monospace; font-size: 11px; fill: #0F548C; }
+      .life { stroke: #C7C7C7; stroke-width: 1.5; stroke-dasharray: 6 5; }
+      .call { stroke: #0F6CBD; stroke-width: 2; }
+      .ret { stroke: #616161; stroke-width: 1.5; stroke-dasharray: 5 4; }
+      .note { fill: #FFF9E5; stroke: #E0C46C; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="900" fill="#FFFFFF"/>
+  <text class="h1" x="30" y="42">Dashboard request and authorization flow</text>
+
+  <!-- Participants -->
+  <rect x="30" y="66" width="200" height="54" rx="10" fill="#EEF4FB" stroke="#0F6CBD" stroke-width="1.5"/>
+  <text class="title" x="130" y="90" text-anchor="middle">Extension</text>
+  <text class="muted" x="130" y="108" text-anchor="middle">in the user's browser</text>
+
+  <rect x="380" y="66" width="200" height="54" rx="10" fill="#FFFFFF" stroke="#0F6CBD" stroke-width="1.5"/>
+  <text class="title" x="480" y="90" text-anchor="middle">Function App</text>
+  <text class="muted" x="480" y="108" text-anchor="middle">HTTP API</text>
+
+  <rect x="700" y="66" width="200" height="54" rx="10" fill="#EEF4FB" stroke="#0F6CBD" stroke-width="1.5"/>
+  <text class="title" x="800" y="90" text-anchor="middle">Azure DevOps APIs</text>
+  <text class="muted" x="800" y="108" text-anchor="middle">called with the viewer's token</text>
+
+  <rect x="960" y="66" width="200" height="54" rx="10" fill="#F1FAF1" stroke="#107C10" stroke-width="1.5"/>
+  <text class="title" x="1060" y="90" text-anchor="middle">Storage</text>
+  <text class="muted" x="1060" y="108" text-anchor="middle">tables and snapshot blobs</text>
+
+  <line class="life" x1="130" y1="120" x2="130" y2="740"/>
+  <line class="life" x1="480" y1="120" x2="480" y2="740"/>
+  <line class="life" x1="800" y1="120" x2="800" y2="740"/>
+  <line class="life" x1="1060" y1="120" x2="1060" y2="740"/>
+
+  <!-- 1 -->
+  <rect class="note" x="140" y="146" width="250" height="44" rx="6"/>
+  <text class="body" x="152" y="164">Get the app token and the user's access</text>
+  <text class="body" x="152" y="181">token from the Azure DevOps SDK</text>
+
+  <!-- 2 -->
+  <text class="body" x="305" y="216" text-anchor="middle">POST /api/dashboard { scope, filters }</text>
+  <text class="mono" x="305" y="232" text-anchor="middle">Authorization: Bearer · X-ADO-Access-Token</text>
+  <line class="call" x1="130" y1="242" x2="478" y2="242" marker-end="url(#arrow)"/>
+
+  <!-- 3 -->
+  <rect class="note" x="490" y="262" width="290" height="44" rx="6"/>
+  <text class="body" x="502" y="280">Verify the app token: HS256 with the extension</text>
+  <text class="body" x="502" y="297">secret, expiry, optional issuer and audience</text>
+
+  <!-- 4 -->
+  <text class="body" x="640" y="340" text-anchor="middle">GET connectionData with the user's token</text>
+  <line class="call" x1="480" y1="350" x2="798" y2="350" marker-end="url(#arrow)"/>
+
+  <!-- 5 -->
+  <text class="body" x="640" y="388" text-anchor="middle">Identity must match the app token, else 401</text>
+  <line class="ret" x1="800" y1="398" x2="482" y2="398" marker-end="url(#arrowGrey)"/>
+
+  <!-- 6 -->
+  <text class="body" x="770" y="438" text-anchor="middle">Read RepoState pointers and DashboardConfig</text>
+  <line class="call" x1="480" y1="448" x2="1058" y2="448" marker-end="url(#arrow)"/>
+
+  <!-- 7 -->
+  <text class="body" x="640" y="486" text-anchor="middle">List projects and repositories, then probe</text>
+  <text class="body" x="640" y="502" text-anchor="middle">the alerts endpoint per repository (8 parallel)</text>
+  <line class="call" x1="480" y1="512" x2="798" y2="512" marker-end="url(#arrow)"/>
+
+  <!-- 8 -->
+  <text class="body" x="640" y="550" text-anchor="middle">allowed · denied · unknown (counted as unverified)</text>
+  <line class="ret" x1="800" y1="560" x2="482" y2="560" marker-end="url(#arrowGrey)"/>
+
+  <!-- 9 -->
+  <text class="body" x="770" y="594" text-anchor="middle">Read latest snapshots (in-memory cache) and</text>
+  <text class="body" x="770" y="610" text-anchor="middle">DailyObservations within the history window</text>
+  <line class="call" x1="480" y1="620" x2="1058" y2="620" marker-end="url(#arrow)"/>
+
+  <!-- 10 -->
+  <rect class="note" x="490" y="638" width="290" height="44" rx="6"/>
+  <text class="body" x="502" y="656">Keep allowed repositories only, aggregate,</text>
+  <text class="body" x="502" y="673">apply filters and remediation SLA</text>
+
+  <!-- 11 -->
+  <text class="body" x="305" y="712" text-anchor="middle">200 DashboardData + unverifiedRepos</text>
+  <line class="ret" x1="480" y1="722" x2="132" y2="722" marker-end="url(#arrowGrey)"/>
+
+  <!-- Footer notes -->
+  <rect x="30" y="766" width="1140" height="110" rx="12" fill="#FAFAFA" stroke="#D1D1D1"/>
+  <text class="title" x="50" y="792">Other endpoints use the same checks</text>
+  <text class="body" x="50" y="816">/api/alerts returns pages of up to 200 alerts with an HMAC-signed cursor bound to the user and query, valid for 15 minutes.</text>
+  <text class="body" x="50" y="836">PUT /api/config and POST /api/collect also require Project Collection Administrators. /api/health is unauthenticated: status and organization name only.</text>
+  <text class="body" x="50" y="856">Errors: 401 or 403 for authentication, 400 for invalid input, 503 when Azure DevOps throttles, 500 with no internal details.</text>
+</svg>

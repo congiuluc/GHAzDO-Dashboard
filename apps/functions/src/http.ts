@@ -1,5 +1,5 @@
 import type { HttpRequest, HttpResponseInit } from "@azure/functions";
-import { AdoHttpError } from "@ghazdo/shared";
+import { AdoHttpError, trimTrailingSlashes } from "@ghazdo/shared";
 import { AuthError } from "./auth.js";
 import { BadRequestError } from "./service.js";
 
@@ -11,7 +11,7 @@ export function corsHeaders(origin: string | null, allowed: string[]): Record<st
     "X-Content-Type-Options": "nosniff",
     Vary: "Origin",
   };
-  if (origin && allowed.includes(origin.toLowerCase().replace(/\/+$/, ""))) {
+  if (origin && allowed.includes(trimTrailingSlashes(origin.toLowerCase()))) {
     base["Access-Control-Allow-Origin"] = origin;
     base["Access-Control-Allow-Headers"] = "Authorization, Content-Type, X-ADO-Access-Token";
     base["Access-Control-Allow-Methods"] = "GET, POST, PUT, OPTIONS";

@@ -82,6 +82,10 @@ One-time setup:
 
 ## Deploy the optional backend
 
+![Shared backend architecture](apps/docs/public/images/backend-architecture.svg)
+
+Collection, request and authorization flows are documented in [apps/docs/content/backend.md](apps/docs/content/backend.md).
+
 ```powershell
 az group create -n rg-ghazdo -l westeurope
 az deployment group create -g rg-ghazdo -f infra/main.bicep `

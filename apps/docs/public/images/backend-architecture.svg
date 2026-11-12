@@ -1,0 +1,165 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Shared backend architecture</title>
+  <desc id="desc">The Security dashboard extension in Azure DevOps calls an Azure Function App over HTTPS. The Function App uses a user-assigned managed identity to read Azure DevOps APIs and to access Storage, Key Vault and Application Insights. Optional Azure Communication Services Email sends the weekly digest.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#424242"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0F6CBD"/>
+    </marker>
+    <style>
+      text { font-family: "Segoe UI", Helvetica, Arial, sans-serif; fill: #242424; }
+      .h1 { font-size: 22px; font-weight: 700; }
+      .group { font-size: 15px; font-weight: 700; fill: #424242; }
+      .title { font-size: 14px; font-weight: 600; }
+      .body { font-size: 12px; fill: #616161; }
+      .mono { font-family: Consolas, "Cascadia Mono", monospace; font-size: 12px; fill: #0F548C; }
+      .label { font-size: 11.5px; fill: #424242; font-weight: 600; }
+      .card { fill: #FFFFFF; stroke: #D1D1D1; stroke-width: 1; }
+      .fn { fill: #F5F9FD; stroke: #B4D6FA; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="760" fill="#FFFFFF"/>
+  <text class="h1" x="30" y="42">Shared backend architecture</text>
+
+  <!-- Azure DevOps -->
+  <rect x="30" y="70" width="330" height="660" rx="14" fill="#EEF4FB" stroke="#0F6CBD" stroke-width="1.5"/>
+  <text class="group" x="50" y="98">Azure DevOps organization</text>
+
+  <rect class="card" x="50" y="118" width="290" height="118" rx="10" stroke="#0F6CBD" stroke-width="1.5"/>
+  <text class="title" x="66" y="144">Security dashboard extension</text>
+  <text class="body" x="66" y="166">Runs in each user's browser (hub,</text>
+  <text class="body" x="66" y="184">organization settings, widgets)</text>
+  <text class="body" x="66" y="206">Sends the extension app token and</text>
+  <text class="body" x="66" y="224">the user's Azure DevOps token</text>
+
+  <rect class="card" x="50" y="292" width="290" height="80" rx="10"/>
+  <text class="title" x="66" y="318">Projects and Git APIs</text>
+  <text class="body" x="66" y="340">List projects and repositories</text>
+  <text class="body" x="66" y="358">Repository enablement</text>
+
+  <rect class="card" x="50" y="400" width="290" height="80" rx="10"/>
+  <text class="title" x="66" y="426">Advanced Security alerts API</text>
+  <text class="body" x="66" y="448">Code scanning, dependency and</text>
+  <text class="body" x="66" y="466">secret alerts per repository</text>
+
+  <rect class="card" x="50" y="508" width="290" height="80" rx="10"/>
+  <text class="title" x="66" y="534">Identity and security APIs</text>
+  <text class="body" x="66" y="556">Connection data (who is calling)</text>
+  <text class="body" x="66" y="574">Project Collection Administrators</text>
+
+  <!-- Legend -->
+  <text class="label" x="50" y="628">Calls into Azure DevOps</text>
+  <line x1="52" y1="650" x2="92" y2="650" stroke="#0F6CBD" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <text class="body" x="102" y="654">Collector: managed identity</text>
+  <line x1="52" y1="676" x2="92" y2="676" stroke="#0F6CBD" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrowBlue)"/>
+  <text class="body" x="102" y="680">API requests: the viewer's own token</text>
+  <text class="body" x="52" y="708">Nothing is cached across requests for</text>
+  <text class="body" x="52" y="724">permission decisions.</text>
+
+  <!-- Azure resource group -->
+  <rect x="400" y="70" width="770" height="660" rx="14" fill="#FAFAFA" stroke="#8A8886" stroke-width="1.5" stroke-dasharray="8 6"/>
+  <text class="group" x="420" y="98">Azure resource group</text>
+  <text class="body" x="590" y="98">deployed by infra/main.bicep</text>
+
+  <!-- Function App -->
+  <rect class="card" x="420" y="115" width="430" height="340" rx="12" stroke="#0F6CBD" stroke-width="1.5"/>
+  <text class="title" x="438" y="141">Function App</text>
+  <text class="body" x="538" y="141">Flex Consumption · Linux · Node 22</text>
+
+  <rect class="fn" x="436" y="156" width="398" height="52" rx="8"/>
+  <text class="title" x="450" y="178">HTTP API</text>
+  <text class="mono" x="450" y="197">/api/health · me · config · dashboard · alerts · collect</text>
+
+  <rect class="fn" x="436" y="214" width="398" height="52" rx="8"/>
+  <text class="title" x="450" y="236">collectCoordinator</text>
+  <text class="body" x="450" y="255">Timer · every hour at :05 · plans the run</text>
+
+  <rect class="fn" x="436" y="272" width="398" height="52" rx="8"/>
+  <text class="title" x="450" y="294">collectWorker</text>
+  <text class="body" x="450" y="313">Queue trigger · one repository per message</text>
+
+  <rect class="fn" x="436" y="330" width="398" height="52" rx="8"/>
+  <text class="title" x="450" y="352">retention</text>
+  <text class="body" x="450" y="371">Timer · daily at 02:30 UTC</text>
+
+  <rect class="fn" x="436" y="388" width="398" height="52" rx="8"/>
+  <text class="title" x="450" y="410">weeklyDigest</text>
+  <text class="body" x="450" y="429">Timer · Mondays at 09:00 UTC · optional email</text>
+
+  <!-- Identity, Key Vault, App Insights -->
+  <rect class="card" x="880" y="115" width="270" height="92" rx="12" fill="#FFF9E5" stroke="#C19C00" stroke-width="1.5"/>
+  <text class="title" x="896" y="141">User-assigned managed identity</text>
+  <text class="body" x="896" y="163">Tokens for Azure DevOps and</text>
+  <text class="body" x="896" y="181">Azure RBAC; no storage keys</text>
+
+  <rect class="card" x="880" y="225" width="270" height="104" rx="12"/>
+  <text class="title" x="896" y="251">Key Vault (RBAC)</text>
+  <text class="mono" x="896" y="273">extension-secret</text>
+  <text class="mono" x="896" y="291">cursor-signing-key</text>
+  <text class="mono" x="896" y="309">acs-email-connection-string</text>
+
+  <rect class="card" x="880" y="347" width="270" height="108" rx="12"/>
+  <text class="title" x="896" y="373">Application Insights</text>
+  <text class="body" x="896" y="395">with Log Analytics workspace</text>
+  <text class="body" x="896" y="415">Local authentication disabled</text>
+  <text class="body" x="896" y="435">Errors logged, never returned</text>
+
+  <!-- Storage -->
+  <rect class="card" x="420" y="485" width="730" height="160" rx="12" stroke="#107C10" stroke-width="1.5"/>
+  <text class="title" x="438" y="511">Storage account</text>
+  <text class="body" x="560" y="511">shared key disabled · Microsoft Entra ID only</text>
+
+  <rect x="436" y="526" width="226" height="104" rx="8" fill="#F1FAF1" stroke="#9FD89F"/>
+  <text class="title" x="450" y="549">Blob container</text>
+  <text class="mono" x="450" y="569">snapshots/</text>
+  <text class="body" x="450" y="589">Immutable gzip JSON per</text>
+  <text class="body" x="450" y="606">repository and run; lifecycle</text>
+  <text class="body" x="450" y="622">delete after 370 days</text>
+
+  <rect x="676" y="526" width="270" height="104" rx="8" fill="#F1FAF1" stroke="#9FD89F"/>
+  <text class="title" x="690" y="549">Tables</text>
+  <text class="mono" x="690" y="569">RepoState</text>
+  <text class="body" x="840" y="569">latest pointers</text>
+  <text class="mono" x="690" y="587">DailyObservations</text>
+  <text class="body" x="840" y="587">history</text>
+  <text class="mono" x="690" y="605">DashboardConfig</text>
+  <text class="body" x="840" y="605">settings</text>
+  <text class="mono" x="690" y="623">CollectionRuns</text>
+  <text class="body" x="840" y="623">run log</text>
+
+  <rect x="960" y="526" width="176" height="104" rx="8" fill="#F1FAF1" stroke="#9FD89F"/>
+  <text class="title" x="974" y="549">Queue</text>
+  <text class="mono" x="974" y="569">collect-repos</text>
+  <text class="body" x="974" y="589">Work items for</text>
+  <text class="body" x="974" y="606">repository</text>
+  <text class="body" x="974" y="622">collectors</text>
+
+  <!-- ACS -->
+  <rect x="420" y="665" width="730" height="48" rx="12" fill="#FFFFFF" stroke="#8A8886" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text class="title" x="438" y="694">Azure Communication Services Email</text>
+  <text class="body" x="700" y="694">Optional · weekly digest · verified sender required</text>
+
+  <!-- Arrows: extension -> API -->
+  <line x1="340" y1="166" x2="434" y2="166" stroke="#0F6CBD" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <text class="label" x="350" y="156">HTTPS</text>
+
+  <!-- Arrows: collector (managed identity) -> ADO APIs -->
+  <path d="M436 250 H408 V430 M436 298 H408" fill="none" stroke="#0F6CBD" stroke-width="2"/>
+  <line x1="408" y1="322" x2="342" y2="322" stroke="#0F6CBD" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <line x1="408" y1="430" x2="342" y2="430" stroke="#0F6CBD" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <!-- Arrows: API (viewer token) -> ADO APIs -->
+  <path d="M436 198 H378 V548" fill="none" stroke="#0F6CBD" stroke-width="2" stroke-dasharray="5 4"/>
+  <line x1="378" y1="350" x2="342" y2="350" stroke="#0F6CBD" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrowBlue)"/>
+  <line x1="378" y1="458" x2="342" y2="458" stroke="#0F6CBD" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrowBlue)"/>
+  <line x1="378" y1="548" x2="342" y2="548" stroke="#0F6CBD" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrowBlue)"/>
+
+  <!-- Arrows: function -> Azure resources -->
+  <line x1="850" y1="160" x2="878" y2="160" stroke="#424242" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="850" y1="276" x2="878" y2="276" stroke="#424242" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="850" y1="400" x2="878" y2="400" stroke="#424242" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="635" y1="455" x2="635" y2="483" stroke="#424242" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text class="label" x="645" y="474">Azure RBAC</text>
+</svg>
