@@ -5,7 +5,7 @@ import { WidgetStatusHelper } from "./dashboardApi";
 import { filtersToQuery, type DashboardScope } from "@ghazdo/shared";
 import { createRoot } from "react-dom/client";
 import { createContext, type AppContext } from "../data/context";
-import { contributionId, initSdk, inHost, notifyLoaded, ServiceIds } from "../sdk";
+import { localContributionId, initSdk, inHost, notifyLoaded, ServiceIds } from "../sdk";
 import "../theme";
 import { parseWidgetConfig, widgetFilters, widgetKindFromContribution, WIDGET_TITLES, type WidgetConfig } from "./widgetConfig";
 import { WidgetView } from "./WidgetView";
@@ -63,8 +63,9 @@ const widget: IConfigurableWidget = {
 
 void initSdk().then(() => {
   if (inHost) {
-    kind = widgetKindFromContribution(contributionId());
-    SDK.register(SDK.getContributionId(), widget);
+    const id = localContributionId();
+    kind = widgetKindFromContribution(id);
+    SDK.register(id, widget);
     notifyLoaded();
   } else void render(undefined, parseWidgetConfig(new URLSearchParams(location.search).get("config")));
 });

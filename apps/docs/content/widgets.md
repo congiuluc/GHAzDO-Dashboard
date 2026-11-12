@@ -22,3 +22,7 @@ Add the widgets to any Azure DevOps project dashboard: **Edit → Add a widget**
 - Widgets read data that was already collected by the hubs (browser mode) or by the [shared backend](#/backend). If nothing has been collected yet, they show *Not collected yet*; open a hub once to fill the cache.
 - Clicking the title or a value opens the matching hub with the same filters applied.
 - The footer shows when data was last updated and flags partial data.
+
+## Troubleshooting
+
+If configuration shows **VS403683** with **The registered object ghazdo-widget-config could not be found**, update the installed extension to a release containing the widget registration fix and reload the dashboard. The configuration page and widgets must register their manifest-local contribution IDs, without the publisher and extension prefix.
