@@ -10,7 +10,7 @@ In browser modes each user collects with their own permissions. Someone without 
 
 ### A widget says *Not collected yet*
 
-Widgets only read data that was already collected. Open the Security dashboard (or the project's Advanced Security overview) once, or connect the shared backend.
+Widgets only read data that was already collected. Open the Security dashboard (or the project's *Advanced Security* page in the left menu) once, or connect the shared backend.
 
 ### Can I use it on Azure DevOps Server?
 

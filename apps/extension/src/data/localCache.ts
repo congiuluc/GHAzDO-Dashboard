@@ -44,7 +44,7 @@ export class LocalCache {
     }
     for (const s of snapshots) {
       const prev = await store.get(s.repositoryId);
-      if ((s.status === "failed" || s.status === "denied") && prev?.status === "ok") {
+      if ((s.status === "failed" || s.status === "denied" || s.status === "notFound") && prev?.status === "ok") {
         await store.put({ ...prev, stale: true, lastAttemptAt: s.collectedAt, error: s.error ?? s.status });
       } else {
         await store.put(s);

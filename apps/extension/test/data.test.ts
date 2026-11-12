@@ -1,6 +1,6 @@
 import "fake-indexeddb/auto";
 import { describe, expect, it } from "vitest";
-import type { AdoClient, DailyObservation, NormalizedAlert, RepoSnapshot } from "@ghazdo/shared";
+import { AdoHttpError, type AdoClient, type DailyObservation, type NormalizedAlert, type RepoSnapshot } from "@ghazdo/shared";
 import { LocalCache } from "../src/data/localCache";
 import { BrowserSource } from "../src/data/browserSource";
 import { UserHistorySync, type DocumentStore, type HistoryDoc } from "../src/data/userHistory";
@@ -45,6 +45,17 @@ describe("LocalCache", () => {
     expect(s.status).toBe("ok");
     expect(s.stale).toBe(true);
     expect(s.error).toBe("boom");
+    expect(s.alerts).toHaveLength(1);
+  });
+
+  it("keeps previous good data marked stale when Advanced Security returns not found", async () => {
+    const cache = newCache();
+    await cache.saveCollection([snap("p1", "r1", "ok", [alert("p1", "r1", 1)])], ["p1"]);
+    await cache.saveCollection([snap("p1", "r1", "notFound")], ["p1"]);
+    const s = (await cache.getSnapshots("p1"))[0]!;
+    expect(s.status).toBe("ok");
+    expect(s.stale).toBe(true);
+    expect(s.error).toBe("notFound");
     expect(s.alerts).toHaveLength(1);
   });
 
@@ -126,6 +137,25 @@ describe("UserHistorySync", () => {
 });
 
 describe("BrowserSource", () => {
+  it("warns when Advanced Security cannot find or access discovered repositories", async () => {
+    const cache = newCache();
+    const client = {
+      listProjects: async () => [{ id: "p1", name: "Project" }],
+      listRepositories: async () => [{ id: "r1", name: "Repo", projectId: "p1", isDisabled: false }],
+      getEnablement: async () => null,
+      listAlerts: async () => {
+        throw new AdoHttpError(404, "not found");
+      },
+    } as unknown as AdoClient;
+    const source = new BrowserSource({ organization: "contoso", cache, client, maxHistoryDays: 90 });
+    const result = await source.refresh({ kind: "organization" });
+    expect(result.warnings).toContain(
+      "1 repositories could not be found or accessed by Advanced Security; verify repository access and that Advanced Security is available.",
+    );
+    const s = (await cache.getSnapshots("p1"))[0]!;
+    expect(s.status).toBe("notFound");
+  });
+
   it("never returns other projects' alerts in project scope", async () => {
     const cache = newCache();
     await cache.saveCollection(

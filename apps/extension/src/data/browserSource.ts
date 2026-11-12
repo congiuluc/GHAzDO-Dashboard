@@ -91,8 +91,10 @@ export class BrowserSource implements DataSource {
     const warnings = [...errors];
     const denied = snapshots.filter((s) => s.status === "denied").length;
     const failed = snapshots.filter((s) => s.status === "failed").length;
+    const notFound = snapshots.filter((s) => s.status === "notFound").length;
     if (denied) warnings.push(`${denied} repositories were skipped because you do not have Advanced Security read permission.`);
     if (failed) warnings.push(`${failed} repositories could not be collected; previous data is shown as stale where available.`);
+    if (notFound) warnings.push(`${notFound} repositories could not be found or accessed by Advanced Security; verify repository access and that Advanced Security is available.`);
     if (this.opts.userHistory) {
       try {
         await this.opts.userHistory.pushDay(utcDay(new Date()), observations);

@@ -1,0 +1,66 @@
+html {
+  scroll-padding-top: 80px;
+}
+body {
+  margin: 0;
+}
+* {
+  box-sizing: border-box;
+}
+
+/* Elements injected into rendered markdown (outside React). Colors come from Fluent CSS variables. */
+.doc-anchor {
+  margin-left: 8px;
+  opacity: 0;
+  text-decoration: none !important;
+  color: var(--colorNeutralForeground3) !important;
+  transition: opacity 0.15s;
+}
+h2:hover > .doc-anchor,
+h3:hover > .doc-anchor,
+.doc-anchor:focus-visible {
+  opacity: 1;
+}
+
+.doc-pre {
+  position: relative;
+}
+.doc-copy {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--colorNeutralForeground2);
+  background: var(--colorNeutralBackground1);
+  border: 1px solid var(--colorNeutralStroke2);
+  border-radius: var(--borderRadiusMedium);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.doc-pre:hover .doc-copy,
+.doc-copy:focus-visible {
+  opacity: 1;
+}
+
+@keyframes doc-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.doc-fade {
+  animation: doc-fade-in 0.25s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .doc-fade {
+    animation: none;
+  }
+}

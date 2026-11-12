@@ -43,7 +43,7 @@ $env:VITE_BACKEND_ALLOWLIST = "https://ghazdo-func-xxxx.azurewebsites.net"
 | Where | What |
 | --- | --- |
 | Organization home → **Advanced Security → Security dashboard** | All projects you can read |
-| Any project → **Repos → Advanced Security overview** | That project only |
+| Any project → **Advanced Security** (left menu, after Artifacts) | That project only |
 | Any dashboard → **Edit → Add a widget** → search *Advanced Security* | The four widgets |
 
 The first time you open a dashboard it collects alerts in your browser, which can take a minute for large organizations. Later visits use the local cache and refresh in the background.

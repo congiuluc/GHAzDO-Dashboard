@@ -1,8 +1,8 @@
 {
   "manifestVersion": 1,
   "id": "ghazdo-dashboard",
-  "publisher": "REPLACE-WITH-PUBLISHER",
-  "version": "1.0.0",
+  "publisher": "4workers",
+  "version": "1.0.2",
   "name": "Advanced Security Dashboard",
   "description": "One dashboard for GitHub Advanced Security for Azure DevOps alerts across all projects and repositories: code scanning, dependency scanning and secret scanning, with history, filters and drill-down.",
   "public": false,
@@ -33,11 +33,18 @@
       "properties": { "name": "Security dashboard", "order": 1, "uri": "dist/hub.html", "icon": "asset://static/icon.png" }
     },
     {
+      "id": "ghazdo-project-hub-group",
+      "type": "ms.vss-web.hub-group",
+      "description": "Project-level Advanced Security navigation group, placed after Artifacts.",
+      "targets": ["ms.vss-web.project-hub-groups-collection"],
+      "properties": { "name": "Advanced Security", "order": 1000, "icon": "asset://static/icon.png" }
+    },
+    {
       "id": "ghazdo-project-hub",
       "type": "ms.vss-web.hub",
       "description": "Advanced Security dashboard for the current project.",
-      "targets": ["ms.vss-code-web.code-hub-group"],
-      "properties": { "name": "Advanced Security overview", "order": 100, "uri": "dist/project-hub.html", "icon": "asset://static/icon.png" }
+      "targets": [".ghazdo-project-hub-group"],
+      "properties": { "name": "Security dashboard", "order": 1, "uri": "dist/project-hub.html", "icon": "asset://static/icon.png" }
     },
     {
       "id": "ghazdo-widget-config",

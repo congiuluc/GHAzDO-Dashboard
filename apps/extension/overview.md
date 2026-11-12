@@ -4,7 +4,7 @@ One place to see **GitHub Advanced Security for Azure DevOps** alerts across eve
 
 ## Highlights
 
-- **Organization dashboard** under *Advanced Security → Security dashboard*, and a **project dashboard** under *Repos → Advanced Security overview*.
+- **Organization dashboard** under *Advanced Security → Security dashboard*, and a **project dashboard** under *Advanced Security* in each project's left menu (after Artifacts).
 - **Code scanning, dependency scanning and secret scanning** in one view, with a dedicated tab for each.
 - **Filter and drill down everywhere**: by project, repository, alert type, severity, state, period and text. Every chart, bar and table row narrows the view, and the URL keeps the filters so a view can be shared.
 - **History and trends**: open alerts over time, new vs fixed per week, time to fix, alert age, and secret exposure age.

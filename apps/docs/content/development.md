@@ -44,4 +44,4 @@ The extension uses `azure-devops-ui` components (Page, Header, Card, Table, Drop
 
 ## Editing these docs
 
-Pages are markdown files in `apps/docs/content`, listed in `apps/docs/src/pages.ts`. Link between pages with `#/<page-id>`.
+Pages are markdown files in `apps/docs/content`, listed in `apps/docs/src/pages.ts`. Link between pages with `#/<page-id>`, or to a section with `#/<page-id>#<heading-slug>`. The site builds the search index, the *On this page* outline, heading anchors and code copy buttons from the markdown automatically, so `##` and `###` headings are all you need.

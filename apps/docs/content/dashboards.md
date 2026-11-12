@@ -5,7 +5,13 @@ The extension adds two hubs. Both share the same tabs, filters and drill-down; t
 | Hub | Location | Scope |
 | --- | --- | --- |
 | **Security dashboard** | Organization → *Advanced Security* | Every project and repository you can read. Includes the **Settings** tab for organization admins. |
-| **Advanced Security overview** | Project → *Repos* | The current project. The project filter is hidden; repository filters and drill-down still work. |
+| **Security dashboard** (project) | Project → *Advanced Security* (left menu, after Artifacts) | The current project. The project filter is hidden; repository filters and drill-down still work. |
+
+## Screenshots
+
+These screenshots use the extension's sample data and show the organization dashboard.
+
+![Organization dashboard overview with alert metrics, severity charts, trends and repository freshness.](./images/organization-overview.png)
 
 ## Guided tour
 
@@ -48,6 +54,8 @@ Ecosystem and advisory panels show *not reported* when the alert API does not re
 
 Secret values are never fetched or stored; only the secret type and alert metadata are shown.
 
+![Secrets dashboard with exposure age, affected repositories and secret types. The screenshot contains sample data, not secret values.](./images/secrets-dashboard.png)
+
 ## Coverage tab
 
 - **Repository coverage**: for each repository, whether code, dependency and secret scanning report data.
@@ -56,6 +64,8 @@ Secret values are never fetched or stored; only the secret type and alert metada
 ## Alerts tab
 
 A sortable, paged table of the alerts matching the current filters, with links to the alert in Azure Repos. Project and repository names in each row are drill-down links.
+
+![Alerts table with severity, alert type, project and repository, state, details and first-seen date. Uses sample data.](./images/alerts-table.png)
 
 ## Settings tab
 

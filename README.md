@@ -3,10 +3,14 @@
 An Azure DevOps Services extension that brings together **GitHub Advanced Security for Azure DevOps** alerts (code scanning, dependency scanning and secret scanning) for every project and repository into one dashboard.
 
 - **Organization hub**: *Advanced Security → Security dashboard*. Filters and drill-down cover projects, repositories, alert types, severities, states, period and search.
-- **Project hub**: *Repos → Advanced Security overview*. Locked to the current project, with drill-down to repositories.
+- **Project hub**: *Advanced Security → Security dashboard* in the project's left menu (after Artifacts). Locked to the current project, with drill-down to repositories.
 - **Tabs**: Overview, Code scanning, Dependencies, Secrets, Coverage, Alerts, plus Settings in the organization hub only.
 - **Widgets**: summary, severity, top repositories, exposed secrets. Each has a scope setting (this project or the whole organization) and repository and type filters. Clicking a widget opens the hub with the same filters.
 - **Shareable views**: filters and the selected tab are kept in the URL hash.
+
+![Organization dashboard overview with alert metrics, severity charts, trends and repository freshness. Uses sample data.](apps/docs/public/images/organization-overview.png)
+
+*The screenshots use sample data. Secret values, code snippets and file paths are never displayed.*
 
 ## Repository layout
 
