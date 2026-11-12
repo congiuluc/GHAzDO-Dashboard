@@ -1,4 +1,4 @@
-import { assertOrganization } from "@ghazdo/shared";
+import { assertOrganization, trimTrailingSlashes } from "@ghazdo/shared";
 
 export interface BackendConfig {
   organization: string;
@@ -30,7 +30,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): BackendConfig 
     cursorKey,
     allowedOrigins: (env.ALLOWED_ORIGINS ?? "")
       .split(",")
-      .map((o) => o.trim().replace(/\/+$/, "").toLowerCase())
+      .map((o) => trimTrailingSlashes(o.trim()).toLowerCase())
       .filter((o) => o.startsWith("https://")),
     issuer: env.APP_TOKEN_ISSUER?.trim() || undefined,
     audience: env.APP_TOKEN_AUDIENCE?.trim() || undefined,

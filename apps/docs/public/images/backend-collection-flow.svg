@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
+  <title id="title">Collection, retention and digest flows</title>
+  <desc id="desc">An hourly timer or an administrator's Collect now plans a run, queues one message per repository, and workers collect and publish each repository. Successful results write a snapshot before moving the repository pointer; failures keep the previous snapshot and mark it stale. Daily retention and the optional weekly digest run on their own timers.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0F6CBD"/>
+    </marker>
+    <style>
+      text { font-family: "Segoe UI", Helvetica, Arial, sans-serif; fill: #242424; }
+      .h1 { font-size: 22px; font-weight: 700; }
+      .h2 { font-size: 15px; font-weight: 700; fill: #424242; }
+      .title { font-size: 14px; font-weight: 600; }
+      .body { font-size: 12px; fill: #616161; }
+      .mono { font-family: Consolas, "Cascadia Mono", monospace; font-size: 12px; fill: #0F548C; }
+      .num { font-size: 13px; font-weight: 700; fill: #FFFFFF; }
+      .card { fill: #FFFFFF; stroke: #B4D6FA; stroke-width: 1.5; }
+      .flow { stroke: #0F6CBD; stroke-width: 2; fill: none; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="560" fill="#FFFFFF"/>
+  <text class="h1" x="30" y="42">Collection, retention and digest flows</text>
+  <text class="h2" x="30" y="80">Hourly collection</text>
+
+  <!-- Step 1 -->
+  <rect class="card" x="30" y="96" width="208" height="150" rx="12"/>
+  <circle cx="54" cy="122" r="12" fill="#0F6CBD"/><text class="num" x="50" y="127">1</text>
+  <text class="title" x="74" y="127">Trigger</text>
+  <text class="body" x="46" y="156">collectCoordinator timer,</text>
+  <text class="body" x="46" y="174">every hour at :05</text>
+  <text class="body" x="46" y="200">or an administrator's</text>
+  <text class="body" x="46" y="218">Collect now:</text>
+  <text class="mono" x="46" y="236">POST /api/collect</text>
+
+  <!-- Step 2 -->
+  <rect class="card" x="264" y="96" width="208" height="150" rx="12"/>
+  <circle cx="288" cy="122" r="12" fill="#0F6CBD"/><text class="num" x="284" y="127">2</text>
+  <text class="title" x="308" y="127">Plan the run</text>
+  <text class="body" x="280" y="156">List projects and repos</text>
+  <text class="body" x="280" y="174">with the managed identity</text>
+  <text class="body" x="280" y="200">Remove repositories that</text>
+  <text class="body" x="280" y="218">no longer exist</text>
+  <text class="body" x="280" y="236">Write a CollectionRuns row</text>
+
+  <!-- Step 3 -->
+  <rect class="card" x="498" y="96" width="208" height="150" rx="12"/>
+  <circle cx="522" cy="122" r="12" fill="#0F6CBD"/><text class="num" x="518" y="127">3</text>
+  <text class="title" x="542" y="127">Fan out</text>
+  <text class="body" x="514" y="156">One message per</text>
+  <text class="body" x="514" y="174">repository on the queue</text>
+  <text class="mono" x="514" y="198">collect-repos</text>
+  <text class="body" x="514" y="220">IDs are validated;</text>
+  <text class="body" x="514" y="238">malformed ones are dropped</text>
+
+  <!-- Step 4 -->
+  <rect class="card" x="732" y="96" width="208" height="150" rx="12"/>
+  <circle cx="756" cy="122" r="12" fill="#0F6CBD"/><text class="num" x="752" y="127">4</text>
+  <text class="title" x="776" y="127">Collect a repository</text>
+  <text class="body" x="748" y="156">Check enablement, then</text>
+  <text class="body" x="748" y="174">list alerts from the</text>
+  <text class="body" x="748" y="192">Advanced Security API</text>
+  <text class="body" x="748" y="218">Batch 8 · up to 3 attempts</text>
+  <text class="body" x="748" y="236">10-minute timeout</text>
+
+  <!-- Step 5 -->
+  <rect class="card" x="966" y="96" width="204" height="150" rx="12"/>
+  <circle cx="990" cy="122" r="12" fill="#0F6CBD"/><text class="num" x="986" y="127">5</text>
+  <text class="title" x="1010" y="127">Publish</text>
+  <text class="body" x="982" y="156">Atomic per repository:</text>
+  <text class="body" x="982" y="174">readers never see a</text>
+  <text class="body" x="982" y="192">partial result</text>
+  <text class="body" x="982" y="218">Other repositories are</text>
+  <text class="body" x="982" y="236">unaffected by a failure</text>
+
+  <line class="flow" x1="238" y1="171" x2="262" y2="171" marker-end="url(#arrow)"/>
+  <line class="flow" x1="472" y1="171" x2="496" y2="171" marker-end="url(#arrow)"/>
+  <line class="flow" x1="706" y1="171" x2="730" y2="171" marker-end="url(#arrow)"/>
+  <line class="flow" x1="940" y1="171" x2="964" y2="171" marker-end="url(#arrow)"/>
+
+  <!-- Outcomes -->
+  <path class="flow" d="M1040 246 V280 H850 V302" marker-end="url(#arrow)"/>
+  <path class="flow" d="M1100 246 V302" marker-end="url(#arrow)"/>
+
+  <rect x="732" y="304" width="236" height="160" rx="12" fill="#F1FAF1" stroke="#9FD89F" stroke-width="1.5"/>
+  <text class="title" x="748" y="330">Success</text>
+  <text class="body" x="748" y="350">Status ok or disabled</text>
+  <text class="body" x="748" y="376">1. Write a gzip snapshot blob</text>
+  <text class="body" x="748" y="396">2. Move the RepoState pointer</text>
+  <text class="body" x="748" y="416">3. Merge today's row into</text>
+  <text class="body" x="764" y="434">DailyObservations</text>
+
+  <rect x="984" y="304" width="186" height="160" rx="12" fill="#FDF3F4" stroke="#EEACB2" stroke-width="1.5"/>
+  <text class="title" x="1000" y="330">Failure</text>
+  <text class="body" x="1000" y="350">denied, notFound, failed</text>
+  <text class="body" x="1000" y="376">Keep the previous</text>
+  <text class="body" x="1000" y="394">snapshot pointer</text>
+  <text class="body" x="1000" y="414">Record status and error</text>
+  <text class="body" x="1000" y="434">Dashboard shows it stale,</text>
+  <text class="body" x="1000" y="452">never as zero alerts</text>
+
+  <!-- Scheduled maintenance -->
+  <text class="h2" x="30" y="296">Scheduled maintenance</text>
+
+  <rect x="30" y="314" width="320" height="160" rx="12" fill="#FFFFFF" stroke="#D1D1D1" stroke-width="1.5"/>
+  <text class="title" x="46" y="340">retention · daily at 02:30 UTC</text>
+  <text class="body" x="46" y="366">Deletes DailyObservations older than</text>
+  <text class="body" x="46" y="384">Max history days (1 to 365)</text>
+  <text class="body" x="46" y="408">Deletes snapshot blobs past the cutoff,</text>
+  <text class="body" x="46" y="426">except each repository's current one</text>
+  <text class="body" x="46" y="450">Blob lifecycle policy: 370-day backstop</text>
+
+  <rect x="374" y="314" width="334" height="160" rx="12" fill="#FFFFFF" stroke="#8A8886" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <text class="title" x="390" y="340">weeklyDigest · Mondays 09:00 UTC</text>
+  <text class="body" x="390" y="366">Skips when no recipients are configured</text>
+  <text class="body" x="390" y="384">Aggregates the latest snapshots for the</text>
+  <text class="body" x="390" y="402">whole organization over 7 days</text>
+  <text class="body" x="390" y="426">Sends counts and top-project risk scores</text>
+  <text class="body" x="390" y="444">through ACS Email; fails loudly if ACS</text>
+  <text class="body" x="390" y="462">or the sender is missing</text>
+
+  <text class="body" x="30" y="510">Deleted or no-longer-visible repositories leave the dashboard at the next plan; their blobs age out through retention.</text>
+  <text class="body" x="30" y="530">The backend reads alerts only. It never changes alert state in Azure DevOps.</text>
+</svg>

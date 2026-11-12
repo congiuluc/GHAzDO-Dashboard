@@ -41,6 +41,11 @@ describe("settings validation", () => {
     expect(validateSlaDays({ critical: 366 }).ok).toBe(false);
     expect(validateDigestRecipients([" Admin@Example.com ", "admin@example.com"])).toEqual({ ok: true, value: ["admin@example.com"] });
     expect(validateDigestRecipients(["not-an-email"]).ok).toBe(false);
+    for (const bad of ["a@b", "a@@b.c", "@b.c", "a@.c", "a@b.", "a b@c.d"]) expect(validateDigestRecipients([bad]).ok).toBe(false);
+    const start = performance.now();
+    expect(validateDigestRecipients([`!@!.${"!.".repeat(50_000)}`]).ok).toBe(false);
+    expect(validateBackendUrl(`https://ghazdo.azurewebsites.net${"/".repeat(50_000)}x`, ["https://ghazdo.azurewebsites.net"]).ok).toBe(true);
+    expect(performance.now() - start).toBeLessThan(500);
     expect(validateDigestRecipients(Array.from({ length: 21 }, (_, i) => `user${i}@example.com`)).ok).toBe(false);
   });
 });

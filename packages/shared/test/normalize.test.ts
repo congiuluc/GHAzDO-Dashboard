@@ -54,6 +54,15 @@ describe("normalizeAlert", () => {
   it("parses package forms", () => {
     expect(parsePackage("@scope/pkg@1.2.3")).toEqual({ name: "@scope/pkg", version: "1.2.3" });
     expect(parsePackage("Newtonsoft.Json 12.0.1")).toEqual({ name: "Newtonsoft.Json", version: "12.0.1" });
+    expect(parsePackage("pkg:npm/%40scope/pkg@1.2.3?arch=x64#sub")).toEqual({ ecosystem: "npm", name: "@scope/pkg", version: "1.2.3" });
+    expect(parsePackage("pkg:NuGet/Newtonsoft.Json")).toEqual({ ecosystem: "nuget", name: "Newtonsoft.Json", version: undefined });
+  });
+
+  it("parses adversarial package URLs in linear time", () => {
+    const start = performance.now();
+    parsePackage(`pkg:./a@${'"@"'.repeat(50_000)}`);
+    parsePackage(`pkg:./a#${"a#".repeat(50_000)}`);
+    expect(performance.now() - start).toBeLessThan(500);
   });
 
   it("dedupes branch occurrences keeping the most recently seen", () => {
