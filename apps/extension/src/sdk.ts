@@ -40,8 +40,12 @@ export function hostInfo(): HostInfo {
 export const getAccessToken = (): Promise<string> => (inHost ? SDK.getAccessToken() : Promise.resolve(""));
 export const getAppToken = (): Promise<string> => (inHost ? SDK.getAppToken() : Promise.resolve(""));
 
-export function contributionId(): string {
-  return inHost ? SDK.getContributionId() : "";
+/** Dashboard object registrations use the manifest-local id, not publisher.extension.id. */
+export function localContributionId(): string {
+  if (!inHost) return "";
+  const id = SDK.getContributionId();
+  const prefix = `${SDK.getExtensionContext().id}.`;
+  return id.startsWith(prefix) ? id.slice(prefix.length) : id;
 }
 
 /** Host service ids. The SDK exposes these as an ambient const enum, which isolatedModules cannot inline. */

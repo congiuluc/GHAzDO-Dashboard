@@ -8,7 +8,7 @@ import { FormItem } from "azure-devops-ui/FormItem";
 import { MessageCard, MessageCardSeverity } from "azure-devops-ui/MessageCard";
 import { MultiSelect, SingleSelect } from "../components/FilterBar";
 import { createContext } from "../data/context";
-import { contributionId, initSdk, inHost, notifyLoaded } from "../sdk";
+import { localContributionId, initSdk, inHost, notifyLoaded } from "../sdk";
 import "../theme";
 import { DEFAULT_WIDGET_CONFIG, parseWidgetConfig, type WidgetConfig } from "./widgetConfig";
 
@@ -92,7 +92,7 @@ const configuration: IWidgetConfiguration = {
 
 void initSdk().then(() => {
   if (inHost) {
-    SDK.register(contributionId(), configuration);
+    SDK.register(localContributionId(), configuration);
     notifyLoaded();
   } else root.render(<ConfigForm initial={current} hasProject onChange={(c) => (current = c)} />);
 });
