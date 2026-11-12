@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Validate and package
+    runs-on: ubuntu-latest
+    env:
+      # Comma-separated HTTPS backend origins compiled into the extension (empty = browser-only builds).
+      VITE_BACKEND_ALLOWLIST: ${{ vars.VITE_BACKEND_ALLOWLIST }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck, lint, test, build
+        run: npm run validate
+
+      # Bicep compilation is offline; no Azure sign-in needed.
+      - name: Build Bicep
+        run: |
+          az bicep install
+          npm run bicep:build
+
+      - name: Package extension and functions
+        run: |
+          npm run package:vsix
+          npm run package:functions
+          cp apps/functions/functions.zip out/
+          cp infra/out/main.json out/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packages
+          path: out/
+          if-no-files-found: error
+          retention-days: 14

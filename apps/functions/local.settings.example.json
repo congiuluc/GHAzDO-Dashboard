@@ -1,0 +1,17 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "ADO_ORGANIZATION": "contoso",
+    "STORAGE_ACCOUNT_NAME": "",
+    "STORAGE_CONNECTION_STRING": "UseDevelopmentStorage=true",
+    "AZURE_CLIENT_ID": "",
+    "EXTENSION_SECRET": "<extension certificate from Marketplace; use a Key Vault reference in Azure>",
+    "CURSOR_SIGNING_KEY": "<random 32+ byte base64 value; use a Key Vault reference in Azure>",
+    "ALLOWED_ORIGINS": "https://contoso.gallerycdn.vsassets.io",
+    "APP_TOKEN_ISSUER": "",
+    "APP_TOKEN_AUDIENCE": "",
+    "COLLECTOR_CONCURRENCY": "6"
+  }
+}

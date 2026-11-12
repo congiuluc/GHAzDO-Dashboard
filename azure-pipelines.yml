@@ -1,0 +1,42 @@
+# Build and validate only. Publishing the extension and deploying Azure resources are intentionally manual.
+trigger:
+  branches:
+    include: [main]
+pr:
+  branches:
+    include: [main]
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  # Comma-separated HTTPS origins the extension may use as a backend (empty = browser-only builds).
+  VITE_BACKEND_ALLOWLIST: ''
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '22.x'
+    displayName: Use Node 22
+
+  - script: npm ci
+    displayName: Install
+
+  - script: npm run validate
+    displayName: Typecheck, lint, test, build
+
+  # Bicep compilation is offline; no Azure sign-in needed.
+  - script: az bicep install && npm run bicep:build
+    displayName: Build Bicep
+
+  - script: |
+      npm run package:vsix
+      npm run package:functions
+      cp apps/functions/functions.zip out/
+    displayName: Package extension and functions
+
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: out
+      artifact: packages
+    displayName: Publish artifacts

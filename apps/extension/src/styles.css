@@ -1,0 +1,117 @@
+/*
+ * Layout and chart styles that complement azure-devops-ui. Every color maps to an Azure DevOps theme
+ * variable (set by the host via SDK applyTheme), with the library's light-theme defaults as fallback
+ * so the pages also render outside Azure DevOps during local development.
+ */
+:root {
+  --ga-text: var(--text-primary-color, rgba(0, 0, 0, 0.9));
+  --ga-text-soft: var(--text-secondary-color, rgba(0, 0, 0, 0.55));
+  --ga-border: rgba(var(--palette-neutral-8, 234, 234, 234), 1);
+  --ga-border-strong: rgba(var(--palette-neutral-30, 166, 166, 166), 1);
+  --ga-surface-soft: rgba(var(--palette-neutral-4, 244, 244, 244), 1);
+  --ga-hover: var(--palette-black-alpha-4, rgba(0, 0, 0, 0.04));
+  --ga-link: var(--communication-foreground, rgba(0, 90, 158, 1));
+  --ga-accent: var(--communication-background, rgba(0, 120, 212, 1));
+  --ga-danger: var(--component-status-error, rgba(205, 74, 69, 1));
+  --ga-warning: var(--component-status-warning, rgba(214, 127, 60, 1));
+  --ga-success: var(--component-status-success, rgba(85, 163, 98, 1));
+  --ga-highlight: var(--status-warning-background, rgba(251, 242, 236, 1));
+
+  --sev-critical: rgba(var(--palette-accent1-dark, 168, 0, 0), 1);
+  --sev-high: var(--ga-danger);
+  --sev-medium: var(--ga-warning);
+  --sev-low: var(--ga-accent);
+  --sev-unknown: var(--component-status-neutral, rgba(102, 102, 102, 1));
+}
+
+html, body, #root { margin: 0; height: 100%; }
+body { color: var(--ga-text); }
+.app-loading { padding: 40px; color: var(--ga-text-soft); }
+.app-root { height: 100%; }
+.app-page { min-height: 100%; }
+.page-body { padding: 0 32px 40px; }
+@media (max-width: 640px) { .page-body { padding: 0 12px 24px; } }
+
+.header-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.collect-progress { display: flex; gap: 8px; align-items: center; min-width: 200px; }
+.collect-progress .bolt-progress-bar { flex: 1; }
+.messages { display: flex; flex-direction: column; gap: 8px; margin: 8px 0 12px; }
+.ga-breadcrumbs { margin: 4px 0 8px; }
+
+.filterbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding: 8px 0 12px; }
+.filterbar .filter-dropdown { min-width: 150px; }
+.filterbar .filter-search { flex: 1; min-width: 240px; }
+.tabbar { margin-bottom: 16px; }
+
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(12, minmax(0, 1fr)); }
+.span-3 { grid-column: span 3; } .span-4 { grid-column: span 4; } .span-6 { grid-column: span 6; } .span-8 { grid-column: span 8; } .span-12 { grid-column: span 12; }
+@media (max-width: 1100px) { .span-3, .span-4 { grid-column: span 6; } .span-6, .span-8 { grid-column: span 12; } }
+@media (max-width: 640px) { .span-3, .span-4, .span-6 { grid-column: span 12; } }
+.grid > .bolt-card, .grid-cell > .bolt-card { height: 100%; min-width: 0; }
+.grid-cell { min-width: 0; }
+.card-hint { color: var(--ga-text-soft); font-size: 12px; font-weight: 400; }
+.empty { color: var(--ga-text-soft); font-size: 13px; padding: 12px 0; }
+
+.link-btn { border: none; background: none; padding: 0; color: var(--ga-link); cursor: pointer; font: inherit; text-align: left; }
+.link-btn:hover { text-decoration: underline; }
+.link-btn:focus-visible, .kpi:focus-visible, .barrow:focus-visible, .legend button:focus-visible { outline: 2px solid var(--focus-border-color, rgba(0, 120, 212, 1)); outline-offset: 2px; }
+
+.kpi { cursor: pointer; text-align: left; width: 100%; font: inherit; color: inherit; border: none; background: none; padding: 0; }
+div.kpi { cursor: default; }
+.kpi .value { font-size: 32px; font-weight: 600; line-height: 1.15; }
+.kpi .label { color: var(--ga-text-soft); font-size: 13px; }
+.delta { font-size: 12px; color: var(--ga-text-soft); }
+.delta.up { color: var(--ga-danger); } .delta.down { color: var(--ga-success); }
+
+.barlist { display: flex; flex-direction: column; gap: 2px; }
+.barrow { display: grid; grid-template-columns: minmax(80px, 38%) 1fr auto; gap: 8px; align-items: center; border: none; background: none; padding: 4px; border-radius: 2px; text-align: left; cursor: pointer; font: inherit; color: inherit; }
+.barrow:hover:not(:disabled) { background: var(--ga-hover); }
+.barrow:disabled { cursor: default; }
+.barrow .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.barrow .track { height: 8px; background: var(--ga-surface-soft); border-radius: 4px; overflow: hidden; }
+.barrow .fill { height: 100%; background: var(--ga-accent); border-radius: 4px; }
+.barrow .count { font-variant-numeric: tabular-nums; color: var(--ga-text-soft); font-size: 12px; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 12px; color: var(--ga-text-soft); }
+.legend button { border: none; background: none; cursor: pointer; display: inline-flex; gap: 4px; align-items: center; padding: 0; color: inherit; font: inherit; }
+.legend button:disabled { cursor: default; }
+.swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+svg text { fill: var(--ga-text-soft); font-size: 11px; }
+svg .gridline { stroke: var(--ga-border); }
+svg .clickable { cursor: pointer; }
+svg .clickable:hover { opacity: 0.8; }
+
+table.data { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.data th, table.data td { padding: 8px; border-bottom: 1px solid var(--ga-border); text-align: left; vertical-align: top; }
+table.data th { color: var(--ga-text-soft); font-weight: 600; white-space: nowrap; }
+table.data tr:hover td { background: var(--ga-hover); }
+.heat td.cell { text-align: center; font-variant-numeric: tabular-nums; cursor: pointer; }
+.sev { display: inline-flex; align-items: center; gap: 6px; text-transform: capitalize; }
+.sev::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--dot, var(--sev-unknown)); flex: none; }
+.yes { color: var(--ga-success); } .no { color: var(--ga-danger); } .unk { color: var(--ga-text-soft); }
+
+.toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+.toolbar .spacer { flex: 1; }
+.alert-table { overflow-x: auto; }
+.alert-table .details { color: var(--ga-text-soft); font-size: 12px; }
+
+.settings-form { display: flex; flex-direction: column; gap: 16px; max-width: 560px; }
+.settings-row { display: flex; gap: 8px; align-items: flex-start; }
+.settings-row > .flex-grow { flex: 1; }
+.help { color: var(--ga-text-soft); font-size: 12px; display: block; }
+
+.widget { padding: 10px 14px; height: 100vh; overflow: hidden; display: flex; flex-direction: column; box-sizing: border-box; }
+.widget h3 { font-size: 14px; margin: 0 0 6px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.widget .body { flex: 1; min-height: 0; }
+.widget .foot { font-size: 11px; color: var(--ga-text-soft); }
+.widget-config { padding: 8px; display: flex; flex-direction: column; gap: 16px; }
+.widget-config .bolt-dropdown-expandable { width: 100%; }
+
+/* Guided tour */
+.tour-progress {
+  margin-top: 8px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+

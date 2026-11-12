@@ -1,0 +1,30 @@
+{
+  "name": "@ghazdo/extension",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "vite build",
+    "package": "vite build && tfx extension create --manifest-globs vss-extension.json --output-path ../../out --rev-version false"
+  },
+  "dependencies": {
+    "azure-devops-extension-api": "^4.264.0",
+    "azure-devops-extension-sdk": "^4.0.2",
+    "idb": "^8.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "azure-devops-ui": "^2.282.0"
+  },
+  "devDependencies": {
+    "@ghazdo/shared": "1.0.0",
+    "@testing-library/react": "^16.3.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^5.0.0",
+    "jsdom": "^27.0.0",
+    "tfx-cli": "^0.24.2",
+    "vite": "^8.0.0"
+  }
+}

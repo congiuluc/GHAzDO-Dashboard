@@ -1,0 +1,12 @@
+node_modules/
+dist/
+out/
+*.vsix
+apps/functions/package/
+*.zip
+local.settings.json
+.env
+.env.*
+!.env.example
+coverage/
+infra/out/
