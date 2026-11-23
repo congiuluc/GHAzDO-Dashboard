@@ -16,7 +16,7 @@
     "@azure/functions": "^4.17.1",
     "@azure/identity": "^4.13.0",
     "@azure/storage-blob": "^12.29.0",
-    "jose": "^6.2.15"
+    "jose": "^6.2.18"
   },
   "devDependencies": {
     "@ghazdo/shared": "0.0.1",
